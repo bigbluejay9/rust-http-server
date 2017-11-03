@@ -97,8 +97,7 @@ fn main() {
         return;
     }
 
-    let addr: SocketAddr;
-    match matches.free[0].parse::<SocketAddr>() {
+    let addr = match matches.free[0].replace("localhost", "127.0.0.1").parse::<SocketAddr>() {
         Err(e) => {
             println!(
                 "Bad address to listen on {}: {}.",
@@ -107,10 +106,8 @@ fn main() {
             );
             return;
         }
-        Ok(a) => {
-            addr = a;
-        }
-    }
+        Ok(a) => a,
+    };
 
     match start_server(&addr) {
         Err(e) => {
