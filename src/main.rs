@@ -56,19 +56,17 @@ fn handle_connection((mut c, _remote): (TcpStream, SocketAddr)) {
         loop {
             match reader.read_line(&mut line) {
                 Ok(read) => {
-                  if read == 2 {
-                    break;
-                  }
+                    if read <= 2 {
+                        break;
+                    }
                 }
                 Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
-                  thread::sleep(time::Duration::from_millis(10));
+                    thread::sleep(time::Duration::from_millis(10));
                 }
                 Err(e) => panic!("Can't read: {}.", e.to_string()),
             };
         }
-        debug!(
-            "Read {} bytes: {}",
-            line.len(), line);
+        debug!("Read {} bytes: {}", line.len(), line);
     }
 
     let response = "HTTP/1.1 200 OK\r\n\r\n";
@@ -97,7 +95,9 @@ fn main() {
         return;
     }
 
-    let addr = match matches.free[0].replace("localhost", "127.0.0.1").parse::<SocketAddr>() {
+    let addr = match matches.free[0]
+        .replace("localhost", "127.0.0.1")
+        .parse::<SocketAddr>() {
         Err(e) => {
             println!(
                 "Bad address to listen on {}: {}.",
